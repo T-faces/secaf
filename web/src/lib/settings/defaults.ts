@@ -2,9 +2,10 @@ import { defaultLocale } from "$lib/i18n/translations";
 import type { CobaltSettings } from "$lib/types/settings";
 
 const defaultSettings: CobaltSettings = {
-    schemaVersion: 4,
+    schemaVersion: 5,
     advanced: {
         debug: false,
+        useWebCodecs: false,
     },
     appearance: {
         theme: "auto",
@@ -14,22 +15,23 @@ const defaultSettings: CobaltSettings = {
         reduceTransparency: false,
     },
     save: {
+        alwaysProxy: false,
+        localProcessing: false,
         audioBitrate: "128",
         audioFormat: "mp3",
         disableMetadata: false,
         downloadMode: "auto",
         filenameStyle: "classic",
         savingMethod: "download",
-        tiktokH265: false,
+        allowH265: false,
         tiktokFullAudio: false,
-        twitterGif: true,
+        convertGif: true,
         videoQuality: "1080",
         youtubeVideoCodec: "h264",
         youtubeDubLang: "original",
         youtubeHLS: false,
     },
     privacy: {
-        alwaysProxy: false,
         disableAnalytics: false,
     },
     processing: {

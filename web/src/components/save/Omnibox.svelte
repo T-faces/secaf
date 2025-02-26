@@ -11,6 +11,7 @@
     import dialogs from "$lib/state/dialogs";
     import { link } from "$lib/state/omnibox";
     import { updateSetting } from "$lib/state/settings";
+    import { savingHandler } from "$lib/api/saving-handler";
     import { pasteLinkFromClipboard } from "$lib/clipboard";
     import { turnstileEnabled, turnstileSolved } from "$lib/state/turnstile";
 
@@ -75,7 +76,7 @@
 
             if (!isBotCheckOngoing) {
                 await tick(); // wait for button to render
-                downloadButton.download($link);
+                savingHandler($link);
             }
         }
     };
@@ -94,7 +95,7 @@
         }
 
         if (e.key === "Enter" && validLink($link) && isFocused) {
-            downloadButton.download($link);
+            savingHandler($link);
         }
 
         if (["Escape", "Clear"].includes(e.key) && isFocused) {
@@ -217,7 +218,7 @@
         flex-direction: column;
         max-width: 640px;
         width: 100%;
-        gap: 8px;
+        gap: 7px;
     }
 
     #input-container {
@@ -242,8 +243,8 @@
     }
 
     #input-container.focused {
-        box-shadow: 0 0 0 1.5px var(--secondary) inset;
-        outline: var(--secondary) 0.5px solid;
+        box-shadow: 0 0 0 1px var(--secondary) inset;
+        outline: var(--secondary) 1px solid;
     }
 
     #input-container.focused :global(#input-icons svg) {

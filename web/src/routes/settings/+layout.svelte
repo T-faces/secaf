@@ -16,8 +16,10 @@
     import IconMusic from "@tabler/icons-svelte/IconMusic.svelte";
     import IconFileDownload from "@tabler/icons-svelte/IconFileDownload.svelte";
 
-    import IconBug from "@tabler/icons-svelte/IconBug.svelte";
+    import IconCpu from "@tabler/icons-svelte/IconCpu.svelte";
     import IconWorld from "@tabler/icons-svelte/IconWorld.svelte";
+
+    import IconBug from "@tabler/icons-svelte/IconBug.svelte";
     import IconAdjustmentsStar from "@tabler/icons-svelte/IconAdjustmentsStar.svelte";
 
     $: versionText = $version
@@ -37,7 +39,7 @@
                 path="/settings/appearance"
                 title={$t("settings.page.appearance")}
                 icon={IconSunHigh}
-                iconColor="blue"
+                iconColor="purple"
             />
             <PageNavTab
                 path="/settings/privacy"
@@ -52,13 +54,13 @@
                 path="/settings/video"
                 title={$t("settings.page.video")}
                 icon={IconMovie}
-                iconColor="green"
+                iconColor="magenta"
             />
             <PageNavTab
                 path="/settings/audio"
                 title={$t("settings.page.audio")}
                 icon={IconMusic}
-                iconColor="green"
+                iconColor="orange"
             />
             <PageNavTab
                 path="/settings/download"
@@ -70,23 +72,30 @@
 
         <PageNavSection>
             <PageNavTab
+                path="/settings/local"
+                title={$t("settings.page.local")}
+                icon={IconCpu}
+                iconColor="blue"
+            />
+            <PageNavTab
                 path="/settings/instances"
                 title={$t("settings.page.instances")}
                 icon={IconWorld}
-                iconColor="gray"
+                iconColor="purple"
             />
+        </PageNavSection>
+
+        <PageNavSection>
             <PageNavTab
                 path="/settings/advanced"
                 title={$t("settings.page.advanced")}
                 icon={IconAdjustmentsStar}
-                iconColor="gray"
             />
             {#if $settings.advanced.debug}
                 <PageNavTab
                     path="/settings/debug"
                     title={$t("settings.page.debug")}
                     icon={IconBug}
-                    iconColor="gray"
                 />
             {/if}
         </PageNavSection>

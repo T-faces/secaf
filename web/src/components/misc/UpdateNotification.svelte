@@ -5,7 +5,7 @@
 </script>
 
 <div id="update-notification" role="alert" aria-atomic="true">
-    <button class="update-button" on:click={() => window.location.reload()}>
+    <button class="button update-button" on:click={() => window.location.reload()}>
         <div class="update-icon">
             <IconComet />
         </div>
@@ -32,6 +32,7 @@
         pointer-events: all;
         gap: 8px;
         margin: var(--padding);
+        margin-right: 71px;
         margin-top: calc(env(safe-area-inset-top) + var(--padding));
         box-shadow:
             var(--button-box-shadow),
@@ -85,9 +86,13 @@
 
     @media screen and (max-width: 535px) {
         #update-notification {
-            bottom: var(--sidebar-height-mobile);
+            bottom: calc(var(--sidebar-height-mobile) + 5px);
             justify-content: center;
             animation: slide-in-bottom 0.4s;
+        }
+
+        .update-button {
+            margin-right: var(--padding);
         }
 
         @keyframes slide-in-bottom {

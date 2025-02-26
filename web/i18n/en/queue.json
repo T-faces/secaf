@@ -1,0 +1,12 @@
+{
+    "title": "local processing",
+    "stub": "nothing here yet, just the two of us.\ntry {{ value }} something!",
+    "stub.download": "downloading",
+    "stub.remux": "remuxing",
+
+    "state.waiting": "queued",
+    "state.starting": "starting...",
+    "state.running.remux": "remuxing",
+    "state.running.fetch": "downloading",
+    "estimated_storage_usage": "estimated storage usage:"
+}

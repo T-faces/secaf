@@ -24,6 +24,7 @@
     import Turnstile from "$components/misc/Turnstile.svelte";
     import NotchSticker from "$components/misc/NotchSticker.svelte";
     import DialogHolder from "$components/dialog/DialogHolder.svelte";
+    import ProcessingQueue from "$components/queue/ProcessingQueue.svelte";
     import UpdateNotification from "$components/misc/UpdateNotification.svelte";
 
     $: reduceMotion =
@@ -77,18 +78,20 @@
     <div
         id="cobalt"
         class:loaded={browser}
+        data-chrome={device.browser.chrome}
         data-iphone={device.is.iPhone}
         data-reduce-motion={reduceMotion}
         data-reduce-transparency={reduceTransparency}
     >
-        {#if $updated}
-            <UpdateNotification />
-        {/if}
         {#if device.is.iPhone && app.is.installed}
             <NotchSticker />
         {/if}
         <DialogHolder />
         <Sidebar />
+        {#if $updated}
+            <UpdateNotification />
+        {/if}
+        <ProcessingQueue />
         <div id="content">
             {#if ($turnstileEnabled && $page.url.pathname === "/") || $turnstileCreated}
                 <Turnstile />
@@ -107,20 +110,30 @@
         --gray: #75757e;
 
         --red: #ed2236;
+        --medium-red: #ce3030;
         --dark-red: #d61c2e;
-        --green: #51cf5e;
+        --green: #30bd1b;
         --blue: #2f8af9;
+        --magenta: #eb445a;
+        --purple: #5857d4;
+        --orange: #f19a38;
+
+        --focus-ring: 0 0 0 2px var(--blue) inset;
 
         --button: #f4f4f4;
-        --button-hover: #e8e8e8;
+        --button-hover: #ededed;
+        --button-press: #e8e8e8;
         --button-active-hover: #2a2a2a;
+
         --button-hover-transparent: rgba(0, 0, 0, 0.06);
+        --button-press-transparent: rgba(0, 0, 0, 0.09);
         --button-stroke: rgba(0, 0, 0, 0.06);
         --button-text: #282828;
-        --button-box-shadow: 0 0 0 1.5px var(--button-stroke) inset;
+        --button-box-shadow: 0 0 0 1px var(--button-stroke) inset;
 
         --button-elevated: #e3e3e3;
         --button-elevated-hover: #dadada;
+        --button-elevated-press: #d3d3d3;
         --button-elevated-shimmer: #ededed;
 
         --popover-glow: var(--button-stroke);
@@ -130,9 +143,11 @@
 
         --dialog-backdrop: rgba(255, 255, 255, 0.3);
 
-        --sidebar-bg: #000000;
-        --sidebar-highlight: #ffffff;
-        --sidebar-hover: rgba(255, 255, 255, 0.1);
+        --sidebar-bg: var(--button);
+        --sidebar-highlight: var(--secondary);
+        --sidebar-stroke: rgba(0, 0, 0, 0.04);
+
+        --content-border: rgba(0, 0, 0, 0.03);
 
         --input-border: #adadb7;
 
@@ -145,23 +160,32 @@
         --sidebar-width: 80px;
         --sidebar-font-size: 11px;
         --sidebar-inner-padding: 4px;
+        --sidebar-tab-padding: 10px;
+
+        /* reduce default inset by 5px if it's not 0 */
         --sidebar-height-mobile: calc(
-            50px + calc(var(--sidebar-inner-padding) * 2) +
-                env(safe-area-inset-bottom)
+            50px + calc(
+                env(safe-area-inset-bottom) - 5px * sign(
+                    env(safe-area-inset-bottom)
+                )
+            )
         );
+
+        --content-border-thickness: 1px;
+        --content-margin: calc(var(--sidebar-inner-padding) + var(--content-border-thickness));
 
         --safe-area-inset-top: env(safe-area-inset-top);
         --safe-area-inset-bottom: env(safe-area-inset-bottom);
 
-        --switcher-padding: var(--sidebar-inner-padding);
+        --switcher-padding: 3.5px;
 
         /* used for fading the tab bar on scroll */
         --sidebar-mobile-gradient: linear-gradient(
             90deg,
             rgba(0, 0, 0, 0.9) 0%,
-            rgba(0, 0, 0, 0) 4%,
+            rgba(0, 0, 0, 0) 5%,
             rgba(0, 0, 0, 0) 50%,
-            rgba(0, 0, 0, 0) 96%,
+            rgba(0, 0, 0, 0) 95%,
             rgba(0, 0, 0, 0.9) 100%
         );
 
@@ -190,15 +214,20 @@
         --green: #37aa42;
 
         --button: #191919;
-        --button-hover: #2a2a2a;
+        --button-hover: #242424;
+        --button-press: #2a2a2a;
+
         --button-active-hover: #f9f9f9;
+
         --button-hover-transparent: rgba(225, 225, 225, 0.1);
+        --button-press-transparent: rgba(225, 225, 225, 0.15);
         --button-stroke: rgba(255, 255, 255, 0.05);
         --button-text: #e1e1e1;
-        --button-box-shadow: 0 0 0 1.5px var(--button-stroke) inset;
+        --button-box-shadow: 0 0 0 1px var(--button-stroke) inset;
 
         --button-elevated: #282828;
-        --button-elevated-hover: #323232;
+        --button-elevated-hover: #2f2f2f;
+        --button-elevated-press: #343434;
 
         --popover-glow: rgba(135, 135, 135, 0.12);
 
@@ -207,8 +236,11 @@
 
         --dialog-backdrop: rgba(0, 0, 0, 0.3);
 
-        --sidebar-bg: #101010;
-        --sidebar-highlight: #f2f2f2;
+        --sidebar-bg: #131313;
+        --sidebar-highlight: var(--secondary);
+        --sidebar-stroke: rgba(255, 255, 255, 0.04);
+
+        --content-border: rgba(255, 255, 255, 0.045);
 
         --input-border: #383838;
 
@@ -217,11 +249,11 @@
 
         --sidebar-mobile-gradient: linear-gradient(
             90deg,
-            rgba(16, 16, 16, 0.9) 0%,
-            rgba(16, 16, 16, 0) 4%,
-            rgba(16, 16, 16, 0) 50%,
-            rgba(16, 16, 16, 0) 96%,
-            rgba(16, 16, 16, 0.9) 100%
+            rgba(19, 19, 19, 0.9) 0%,
+            rgba(19, 19, 19, 0) 5%,
+            rgba(19, 19, 19, 0) 50%,
+            rgba(19, 19, 19, 0) 95%,
+            rgba(19, 19, 19, 0.9) 100%
         );
 
         --skeleton-gradient: linear-gradient(
@@ -237,6 +269,11 @@
             var(--button-elevated-hover),
             var(--button-elevated)
         );
+    }
+
+    /* fall back to less pretty value cuz chrome doesn't support sign() */
+    :global([data-chrome="true"]) {
+        --sidebar-height-mobile: calc(50px + env(safe-area-inset-bottom));
     }
 
     :global([data-theme="light"] [data-reduce-transparency="true"]) {
@@ -281,6 +318,10 @@
 
         #cobalt[data-iphone="true"] #content {
             padding-right: env(safe-area-inset-right);
+            /* disable the desktop frame */
+            margin: 0;
+            box-shadow: none;
+            border-radius: 0;
         }
     }
 
@@ -288,30 +329,44 @@
         display: flex;
         overflow: scroll;
         background-color: var(--primary);
-        border-top-left-radius: var(--border-radius);
-        border-bottom-left-radius: var(--border-radius);
+        box-shadow: 0 0 0 var(--content-border-thickness) var(--content-border);
+
+        border-radius: 8px;
+        margin: var(--content-margin);
+        margin-left: var(--content-border-thickness);
     }
 
     #content:dir(rtl) {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: var(--border-radius);
-        border-bottom-right-radius: var(--border-radius);
+        margin-left: var(--content-margin);
+        margin-right: var(--content-border-thickness);
     }
 
     @media screen and (max-width: 535px) {
+        /* dark navbar cuz it looks better on mobile */
+        :global([data-theme="light"]) {
+            --sidebar-bg: #000000;
+            --sidebar-highlight: var(--primary);
+        }
+
         #cobalt {
             display: grid;
             grid-template-columns: unset;
-            grid-template-rows: 1fr var(--sidebar-height-mobile);
+            grid-template-rows:
+                1fr
+                calc(
+                    var(--sidebar-height-mobile) + var(--sidebar-inner-padding) * 2
+                );
         }
 
         #content,
         #content:dir(rtl) {
             padding-top: env(safe-area-inset-top);
             order: -1;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
+
+            margin: 0;
+            box-shadow: none;
+            border-radius: 0;
+
             border-bottom-left-radius: calc(var(--border-radius) * 2);
             border-bottom-right-radius: calc(var(--border-radius) * 2);
         }
@@ -362,7 +417,7 @@
     }
 
     :global(:focus-visible) {
-        box-shadow: 0 0 0 2px var(--blue) inset !important;
+        box-shadow: var(--focus-ring) !important;
         outline: none;
         z-index: 1;
     }
@@ -371,25 +426,39 @@
         box-shadow: none !important;
     }
 
-    :global(button:active, .button:active) {
-        background-color: var(--button-hover);
-    }
-
     :global(.button.elevated) {
         background-color: var(--button-elevated);
-    }
-
-    :global(.button.elevated:not(.color):active) {
-        background-color: var(--button-elevated-hover);
-    }
-
-    :global(.button.elevated:not(:focus-visible)) {
-        box-shadow: none;
     }
 
     :global(.button.active) {
         color: var(--primary);
         background-color: var(--secondary);
+    }
+
+    @media (hover: hover) {
+        :global(.button:hover) {
+            background-color: var(--button-hover);
+        }
+
+        :global(.button.elevated:not(.color):hover) {
+            background-color: var(--button-elevated-hover);
+        }
+
+        :global(.button.active:not(.color):hover) {
+            background-color: var(--button-active-hover);
+        }
+    }
+
+    :global(.button:active) {
+        background-color: var(--button-press);
+    }
+
+    :global(.button.elevated:not(.color):active) {
+        background-color: var(--button-elevated-press);
+    }
+
+    :global(.button.elevated:not(:focus-visible)) {
+        box-shadow: none;
     }
 
     :global(.button.active:not(.color):active) {
@@ -411,20 +480,6 @@
     :global(input) {
         user-select: text;
         -webkit-user-select: text;
-    }
-
-    @media (hover: hover) {
-        :global(button:hover) {
-            background-color: var(--button-hover);
-        }
-
-        :global(.button.elevated:not(.color):hover) {
-            background-color: var(--button-elevated-hover);
-        }
-
-        :global(.button.active:not(.color):hover) {
-            background-color: var(--button-active-hover);
-        }
     }
 
     :global(.center-column-container) {
